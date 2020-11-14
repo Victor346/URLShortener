@@ -1,16 +1,10 @@
 // Imports
 const express = require('express');
 const webRoutes = require('./routes/web');
-
-// Session imports
-let cookieParser = require('cookie-parser');
-let session = require('express-session');
-let flash = require('express-flash');
-let passport = require('passport');
+const cors = require('cors');
 
 // Express app creation
 const app = express();
-
 
 // Configurations
 const appConfig = require('./configs/app');
@@ -26,29 +20,12 @@ const hbs = exphbs.create({
 });
 app.engine(extNameHbs, hbs.engine);
 app.set('view engine', extNameHbs);
-
-// Session configurations
-let sessionStore = new session.MemoryStore;
-app.use(cookieParser());
-app.use(session({
-  cookie: { maxAge: 60000 },
-  store: sessionStore,
-  saveUninitialized: true,
-  resave: 'true',
-  secret: appConfig.secret
-}));
-app.use(flash());
-
-// Passport configurations
-require('./configs/passport');
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(express.static('public'))
+app.use(cors())
 
 // Receive parameters from the Form requests
-app.use(express.urlencoded({ extended: true }));
-
-// Route for static files
-app.use('/', express.static(__dirname + '/public'));
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
 // Routes
 app.use('/', webRoutes);
